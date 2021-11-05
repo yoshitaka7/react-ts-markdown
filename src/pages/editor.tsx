@@ -1,33 +1,15 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import * as ReactMarkdown from 'react-markdown'
-const StorageKey = 'pages/editor:text'
 import { useStateWithStorage } from '../hooks/use_state_with_storage'
 import { putMemo } from '../indexeddb/memos'
-import { Button } from '../ components/button'
-import { SaveModal } from '../ components/save_modal'
+import { Button } from '../components/button'
+import { SaveModal } from '../components/save_modal'
+import { Header } from '../components/header'
 import { Link } from 'react-router-dom'
-const { useState } = React
+import ConvertMarkdownWorker from 'worker-loader!../worker/convert_markdown_worker'
 
-const Header = styled.header`
-  align-content: center;
-  display: flex;
-  font-size: 1.5rem;
-  height: 2rem;
-  left: 0;
-  justify-content: space-between;
-  line-height: 2rem;
-  padding: 0.5rem 1rem;
-  position: fixed;
-  right: 0;
-  top: 0;
-`
-
-const HeaderControl = styled.div`
-height: 2rem;
-display: flex;
-align-content: center;
-`
+const convertMarkdownWorker = new ConvertMarkdownWorker()
+const { useState, useEffect } = React
 
 const Wrapper = styled.div`
   bottom: 0;
@@ -35,6 +17,14 @@ const Wrapper = styled.div`
   position: fixed;
   right: 0;
   top: 3rem;
+`
+
+const HeaderArea = styled.div`
+position: fixed;
+right: 0;
+top: 3rem;
+top: 0;
+left: 0;
 `
 
 const TextArea = styled.textarea`
@@ -60,31 +50,45 @@ const Preview = styled.div`
   width: 50vw;
 `
 
-export const Editor: React.FC = () => {
-  const [text, setText] = useStateWithStorage('', StorageKey)
+interface Props {
+  text: string
+  setText: (text: string) => void
+}
 
+export const Editor: React.FC<Props> = (props) => {
+  const { text, setText } = props
   const [showModal, setShowModal] = useState(false)
+  const [html, setHtml] = useState('')
+
+  useEffect(() => {
+    convertMarkdownWorker.onmessage = (event) => {
+      setHtml(event.data.html)
+    }
+  }, [])
+
+  useEffect(() => {
+    convertMarkdownWorker.postMessage(text)
+  }, [text])
 
   return (
     <>
-      <Header>
-        Markdown Editor
-        <HeaderControl>
+      <HeaderArea>
+        <Header title="Markdown Editor">
           <Button onClick={() => setShowModal(true)}>
             保存する
           </Button>
           <Link to="/history">
             履歴を見る
           </Link>
-        </HeaderControl>
-      </Header>
+        </Header>
+      </HeaderArea>
       <Wrapper>
         <TextArea
           onChange={(event) => setText(event.target.value)}
           value={text}
         />
         <Preview>
-          <ReactMarkdown>{text}</ReactMarkdown>
+          <div dangerouslySetInnerHTML={{ __html: html }} />
         </Preview>
       </Wrapper>
       {showModal && (
