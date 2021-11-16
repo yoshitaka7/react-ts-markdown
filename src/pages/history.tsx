@@ -75,6 +75,7 @@ const Paging = styled.div`
     }
   `
 
+//props型宣言
 interface Props {
   setText: (text: string) => void
 }
@@ -86,19 +87,20 @@ export const History: React.FC<Props> = (props) => {
   const [page, setPage] = useState(1)
   const [maxPage, setMaxPage] = useState(1)
 
+  //記事の取得とページ数取得
   useEffect(() => {
     getMemos(1).then(setMemos)
     getMemoPageCount().then(setMaxPage)
   }, [])
 
   const canNextPage: boolean = page < maxPage
-    const canPrevPage: boolean = page > 1
-    const movePage = (targetPage: number) => {
-      if (targetPage < 1 || maxPage < targetPage) {
-        return
-      }
-      setPage(targetPage)
-      getMemos(targetPage).then(setMemos)
+  const canPrevPage: boolean = page > 1
+  const movePage = (targetPage: number) => {
+    if (targetPage < 1 || maxPage < targetPage) {
+      return
+    }
+    setPage(targetPage)  //表示するページをset
+    getMemos(targetPage).then(setMemos)  //ページ数をもとに記事取得、setState
     }
 
   return (
@@ -111,6 +113,7 @@ export const History: React.FC<Props> = (props) => {
         </Header>
       </HeaderArea>
       <Wrapper>
+      {/* 記事一覧*/}
       {memos.map(memo => (
             <Memo
               key={memo.datetime}

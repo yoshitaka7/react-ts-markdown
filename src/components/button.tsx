@@ -18,6 +18,7 @@ const StyledButton = styled.button`
   }
 `
 
+//型宣言
 interface Props {
   cancel?: boolean
   children: string

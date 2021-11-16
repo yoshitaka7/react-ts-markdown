@@ -33,6 +33,7 @@ const Control = styled.div`
   padding: 1rem;
 `
 
+//型宣言
 interface Props {
   onSave: (title: string) => void
   onCancel: () => void

@@ -25,6 +25,7 @@ const HeaderControl = styled.div`
   }
 `
 
+//props型宣言
 interface Props {
   title: string
   children: React.ReactNode

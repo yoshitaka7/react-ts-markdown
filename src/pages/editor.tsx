@@ -1,6 +1,5 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { useStateWithStorage } from '../hooks/use_state_with_storage'
 import { putMemo } from '../indexeddb/memos'
 import { Button } from '../components/button'
 import { SaveModal } from '../components/save_modal'
@@ -50,6 +49,7 @@ const Preview = styled.div`
   width: 50vw;
 `
 
+//props型定義
 interface Props {
   text: string
   setText: (text: string) => void
@@ -57,15 +57,17 @@ interface Props {
 
 export const Editor: React.FC<Props> = (props) => {
   const { text, setText } = props
-  const [showModal, setShowModal] = useState(false)
+  const [showModal, setShowModal] = useState(false)  //modal
   const [html, setHtml] = useState('')
 
+  //workerから帰ってきたHTMLをsetState
   useEffect(() => {
     convertMarkdownWorker.onmessage = (event) => {
       setHtml(event.data.html)
     }
   }, [])
 
+  //text更新都度worker処理を挟む
   useEffect(() => {
     convertMarkdownWorker.postMessage(text)
   }, [text])
@@ -83,14 +85,16 @@ export const Editor: React.FC<Props> = (props) => {
         </Header>
       </HeaderArea>
       <Wrapper>
+         {/* 入力した値をsetState */}
         <TextArea
           onChange={(event) => setText(event.target.value)}
           value={text}
         />
         <Preview>
-          <div dangerouslySetInnerHTML={{ __html: html }} />
+          <div dangerouslySetInnerHTML={{ __html: html }} />  {/* 変換したHTMLを挿入 */}
         </Preview>
       </Wrapper>
+      {/* putMemoでindexed dbに保存 */}
       {showModal && (
         <SaveModal
           onSave={(title: string): void => {

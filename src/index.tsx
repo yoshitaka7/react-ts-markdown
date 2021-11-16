@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { render } from 'react-dom'
-import styled from 'styled-components'
 import { createGlobalStyle } from 'styled-components'
 import { Editor } from './pages/editor'
 import { History } from './pages/history'
@@ -27,13 +26,13 @@ import {
         <GlobalStyle />
         <Router>
           <Switch>
-            <Route exact path="/editor">
+            <Route exact path="/editor">  {/* 編集画面 */}
               <Editor
                 text={text}
                 setText={setText}
               />
             </Route>
-            <Route exact path="/history">
+            <Route exact path="/history"> {/* 履歴画面 */}
               <History
                 setText={setText}
               />
